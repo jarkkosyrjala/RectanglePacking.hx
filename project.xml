@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+    <meta title="RectanglePacking" package="org.villekoskela" version="1.0.0" company="Company Name"/>
+    <app main="org.villekoskela.RectanglePackerDemo" path="Export" file="RectanglePackerDemo"/>
+    <window width="480" height="480" />
+    <source path="src"/>
+
+    <haxelib name="openfl"/>
+</project>
