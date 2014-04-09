@@ -93,6 +93,9 @@ class RectanglePackerDemo extends Sprite {
 		addChild(mScalingBox);
 
 		createRectangles();
+		if(stage!=null) {
+			updateRectangles();
+		}
 	}
 
 	/**
