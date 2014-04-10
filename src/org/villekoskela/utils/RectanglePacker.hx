@@ -30,6 +30,7 @@
  */
 package org.villekoskela.utils;
 
+import flash.Vector;
 import flash.geom.Rectangle;
 
 /**
@@ -46,16 +47,16 @@ class RectanglePacker
 	private var mPackedWidth:Int = 0;
 	private var mPackedHeight:Int = 0;
 
-	private var mInsertList:Array<SortableSize> = [];
+	private var mInsertList:Vector<SortableSize> = new Vector<SortableSize>();
 
-	private var mInsertedRectangles:Array<IntegerRectangle> = new Array<IntegerRectangle>();
-	private var mFreeAreas:Array<IntegerRectangle> = new Array<IntegerRectangle>();
-	private var mNewFreeAreas:Array<IntegerRectangle> = new Array<IntegerRectangle>();
+	private var mInsertedRectangles:Vector<IntegerRectangle> = new Vector<IntegerRectangle>();
+	private var mFreeAreas:Vector<IntegerRectangle> = new Vector<IntegerRectangle>();
+	private var mNewFreeAreas:Vector<IntegerRectangle> = new Vector<IntegerRectangle>();
 
 	private var mOutsideRectangle:IntegerRectangle;
 
-	private var mSortableSizeStack:Array<SortableSize> = new Array<SortableSize>();
-	private var mRectangleStack:Array<IntegerRectangle> = new Array<IntegerRectangle>();
+	private var mSortableSizeStack:Vector<SortableSize> = new Vector<SortableSize>();
+	private var mRectangleStack:Vector<IntegerRectangle> = new Vector<IntegerRectangle>();
 
 	public var rectangleCount(get, never):Int;
  	private function get_rectangleCount():Int { return mInsertedRectangles.length; }
@@ -102,8 +103,7 @@ class RectanglePacker
 		mPackedWidth = 0;
 		mPackedHeight = 0;
 
-		//mFreeAreas[0] = allocateRectangle(0, 0, mWidth, mHeight);
-		mFreeAreas.push(allocateRectangle(0, 0, mWidth, mHeight));
+		mFreeAreas[0] = allocateRectangle(0, 0, mWidth, mHeight);
 
 		while (mInsertList.length>0)
 		{
@@ -155,8 +155,9 @@ class RectanglePacker
 	public function insertRectangle(width:Int, height:Int, id:Int):Void
 	{
 		var sortableSize:SortableSize = allocateSize(width, height, id);
-		mInsertList.push(sortableSize);
-	}/**
+		mInsertList[mInsertList.length]=sortableSize;
+	}
+	/**
 	* Replacement function for flash sortOn method
 	**/
 	private function sortOnWidth(a:SortableSize,b:SortableSize):Int {
@@ -173,7 +174,6 @@ class RectanglePacker
 	{
 		if (sort)
 		{
-			//mInsertList.sortOn("width", Array.NUMERIC);
 			mInsertList.sort(sortOnWidth);
 		}
 
@@ -195,12 +195,11 @@ class RectanglePacker
 
 				while (mNewFreeAreas.length > 0)
 				{
-					//mFreeAreas[mFreeAreas.length] = mNewFreeAreas.pop();
-					mFreeAreas.push(mNewFreeAreas.pop());
+					mFreeAreas[mFreeAreas.length] = mNewFreeAreas.pop();
+					//mFreeAreas.push(mNewFreeAreas.pop());
 				}
 
-				//mInsertedRectangles[mInsertedRectangles.length] = target;
-				mInsertedRectangles.push(target);
+				mInsertedRectangles[mInsertedRectangles.length] = target;
 
 				if (target.right > mPackedWidth)
 				{
@@ -222,7 +221,7 @@ class RectanglePacker
 	 * Removes rectangles from the filteredAreas that are sub rectangles of any rectangle in areas.
 	 * @param areas rectangles from which the Std.is(filtering,performed)
 	 */
-	private function filterSelfSubAreas(areas:Array<IntegerRectangle>):Void
+	private function filterSelfSubAreas(areas:Vector<IntegerRectangle>):Void
 	{
 		for(i in new DecIter(areas.length - 1,0))
 		{
@@ -256,7 +255,7 @@ class RectanglePacker
 	 * @param areas the areas to be divided
 	 * @return list of new areas
 	 */
-	private function generateNewFreeAreas(target:IntegerRectangle, areas:Array<IntegerRectangle>, results:Array<IntegerRectangle>):Void
+	private function generateNewFreeAreas(target:IntegerRectangle, areas:Vector<IntegerRectangle>, results:Vector<IntegerRectangle>):Void
 	{
 		// Increase dimensions by one to get the areas on right / bottom this rectangle touches
 		// Also add the padding here
@@ -305,43 +304,41 @@ class RectanglePacker
 	 * @param area rectangle to be divided into sub areas around the divider
 	 * @param results vector for the new sub areas around the divider
 	 */
-	private function generateDividedAreas(divider:IntegerRectangle, area:IntegerRectangle, results:Array<IntegerRectangle>):Void
+	private function generateDividedAreas(divider:IntegerRectangle, area:IntegerRectangle, results:Vector<IntegerRectangle>):Void
 	{
 		var count:Int = 0;
 		var rightDelta:Int = area.right - divider.right;
 		if (rightDelta > 0)
 		{
-			//results[results.length] = allocateRectangle(divider.right, area.y, rightDelta, area.height);
-			results.push(allocateRectangle(divider.right, area.y, rightDelta, area.height));
+			results[results.length] = allocateRectangle(divider.right, area.y, rightDelta, area.height);
 			count++;
 		}
 
 		var leftDelta:Int = divider.x - area.x;
 		if (leftDelta > 0)
 		{
-			results.push(allocateRectangle(area.x, area.y, leftDelta, area.height));
+			results[results.length]=allocateRectangle(area.x, area.y, leftDelta, area.height);
 			count++;
 		}
 
 		var bottomDelta:Int = area.bottom - divider.bottom;
 		if (bottomDelta > 0)
 		{
-			results.push(allocateRectangle(area.x, divider.bottom, area.width, bottomDelta));
+			results[results.length]=allocateRectangle(area.x, divider.bottom, area.width, bottomDelta);
 			count++;
 		}
 
 		var topDelta:Int = divider.y - area.y;
 		if (topDelta > 0)
 		{
-			results.push(allocateRectangle(area.x, area.y, area.width, topDelta));
+			results[results.length]=allocateRectangle(area.x, area.y, area.width, topDelta);
 			count++;
 		}
 
 		if (count == 0 && (divider.width < area.width || divider.height < area.height))
 		{
 			// Only touching the area, store the area itself
-			//results[results.length] = area;
-			results.push(area);
+			results[results.length] = area;
 		}
 		else
 		{
@@ -364,7 +361,7 @@ class RectanglePacker
 		var paddedHeight:Int = height + mPadding;
 
 		var count:Int = mFreeAreas.length;
-		//for (var i:int = count - 1; i >= 0; i--)
+
 	    for(i in new DecIter(count-1,0)) {
 			var free:IntegerRectangle = mFreeAreas[i];
 			if (free.x < mPackedWidth || free.y < mPackedHeight)
@@ -433,8 +430,7 @@ class RectanglePacker
 	 */
 	private function freeRectangle(rectangle:IntegerRectangle):Void
 	{
-		//mRectangleStack[mRectangleStack.length] = rectangle;
-		mRectangleStack.push(rectangle);
+		mRectangleStack[mRectangleStack.length] = rectangle;
 	}
 
 	/**
@@ -465,7 +461,6 @@ class RectanglePacker
 	 */
 	private function freeSize(size:SortableSize):Void
 	{
-		//mSortableSizeStack[mSortableSizeStack.length] = size;
-		mSortableSizeStack.push(size);
+		mSortableSizeStack[mSortableSizeStack.length] = size;
 	}
 }
