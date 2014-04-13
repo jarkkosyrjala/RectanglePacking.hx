@@ -30,6 +30,7 @@
  */
 package org.villekoskela.tools;
 
+import flash.geom.Point;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
@@ -74,7 +75,13 @@ class ScalingBox extends Sprite
 		this.y = y;
 
 		mDragBox.graphics.beginFill(0xFF8050);
+		#if mobile
+		mDragBox.graphics.drawCircle(0, 0, 30);
+		#elseif html5
+		mDragBox.graphics.drawCircle(0, 0, 20);
+		#else
 		mDragBox.graphics.drawCircle(0, 0, 10);
+		#end
 		mDragBox.graphics.endFill();
 
 		addChild(mDragBox);
@@ -112,11 +119,11 @@ class ScalingBox extends Sprite
 
 	private function onMouseMove(event:MouseEvent):Void
 	{
-
+		var p:Point=this.parent.globalToLocal(new Point(event.stageX,event.stageY));
 		if (mDragging)
 		{
-			mNewWidth = event.stageX - mX;
-			mNewHeight = event.stageY - mY;
+			mNewWidth = p.x-mX;
+			mNewHeight = p.y-mY;
 
 			if (mNewWidth > mMaxWidth)
 			{

@@ -160,7 +160,7 @@ class RectanglePacker
 	/**
 	* Replacement function for flash sortOn method
 	**/
-	private function sortOnWidth(a:SortableSize,b:SortableSize):Int {
+	inline private function sortOnWidth(a:SortableSize,b:SortableSize):Int {
 		if(a.width==b.width) return 0;
 		if(a.width>b.width) return 1;
 		else return -1;

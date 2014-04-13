@@ -30,6 +30,8 @@
  */
 package org.villekoskela;
 
+import org.villekoskela.utils.IntegerRectangle;
+import flash.Vector;
 import flash.Lib;
 import flash.display.Bitmap;
 import flash.display.BitmapData;
@@ -64,14 +66,12 @@ class RectanglePackerDemo extends Sprite {
 	private var mPacker:RectanglePacker;
 	private var mScalingBox:ScalingBox;
 
-	private var mRectangles:Array<Rectangle> = new Array<Rectangle>();
+	private var mRectangles:Vector<IntegerRectangle> = new Vector<IntegerRectangle>();
 
 	//public function new()
 	public function new()
 	{
 		super();
-		addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
-		addEventListener(Event.ENTER_FRAME, onEnterFrame);
 
 		var bitmap:Bitmap = new Bitmap(mBitmapData);
 		addChild(bitmap);
@@ -93,8 +93,12 @@ class RectanglePackerDemo extends Sprite {
 		addChild(mScalingBox);
 
 		createRectangles();
+
+
 		if(stage!=null) {
-			updateRectangles();
+			onAddedToStage();
+		} else {
+			addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 		}
 	}
 
@@ -109,22 +113,30 @@ class RectanglePackerDemo extends Sprite {
 		{
 			width = Std.int(20 * SIZE_MULTIPLIER + Math.floor(Math.random() * 8) * SIZE_MULTIPLIER * SIZE_MULTIPLIER);
 			height = Std.int(20 * SIZE_MULTIPLIER + Math.floor(Math.random() * 8) * SIZE_MULTIPLIER * SIZE_MULTIPLIER);
-			mRectangles.push(new Rectangle(0, 0, width, height));
+			mRectangles.push(new IntegerRectangle(0, 0, width, height));
 		}
 
 		for (j in 10...RECTANGLE_COUNT)
 		{
 			width = Std.int(3 * SIZE_MULTIPLIER + Math.floor(Math.random() * 8) * SIZE_MULTIPLIER);
 			height = Std.int(3 * SIZE_MULTIPLIER + Math.floor(Math.random() * 8) * SIZE_MULTIPLIER);
-			mRectangles.push(new Rectangle(0, 0, width, height));
+			mRectangles.push(new IntegerRectangle(0, 0, width, height));
 		}
 	}
 
-	private function onAddedToStage(event:Event):Void
+	private function onAddedToStage(event:Event=null):Void
 	{
-		updateRectangles();
 		stage.scaleMode = StageScaleMode.NO_SCALE;
-		stage.align = StageAlign.TOP;
+		stage.align = StageAlign.TOP_LEFT;
+
+		onResize();
+		stage.addEventListener(Event.RESIZE,onResize);
+
+		updateRectangles();
+		addEventListener(Event.ENTER_FRAME, onEnterFrame);
+	}
+	private function onResize(e:Event=null):Void {
+		this.scaleX=this.scaleY=Math.floor( this.scaleY=Math.min(stage.stageWidth,stage.stageHeight) / 48)/10;
 	}
 
 	private function onEnterFrame(event:Event):Void
@@ -143,7 +155,6 @@ class RectanglePackerDemo extends Sprite {
 
 		if (mPacker == null)
 		{
-			//mPacker = new RectanglePacker(mScalingBox.newBoxWidth, mScalingBox.newBoxHeight, padding);
 			mPacker = new RectanglePacker(Std.int(mScalingBox.newBoxWidth), Std.int(mScalingBox.newBoxHeight), padding);
 		}
 		else
@@ -153,7 +164,7 @@ class RectanglePackerDemo extends Sprite {
 
 		for (i in 0...RECTANGLE_COUNT)
 		{
-			mPacker.insertRectangle(Std.int(mRectangles[i].width), Std.int(mRectangles[i].height), i);
+			mPacker.insertRectangle(mRectangles[i].width, mRectangles[i].height, i);
 		}
 
 		mPacker.packRectangles();

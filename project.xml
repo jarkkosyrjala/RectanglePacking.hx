@@ -2,8 +2,9 @@
 <project>
     <meta title="RectanglePacking" package="org.villekoskela" version="1.0.0" company="Company Name"/>
     <app main="org.villekoskela.RectanglePackerDemo" path="Export" file="RectanglePackerDemo"/>
-    <window width="480" height="480" />
+    <window width="0" height="0" />
     <source path="src"/>
 
     <haxelib name="openfl"/>
+    <!-- haxeflag name="-D advanced-telemetry" if="flash" / -->
 </project>
