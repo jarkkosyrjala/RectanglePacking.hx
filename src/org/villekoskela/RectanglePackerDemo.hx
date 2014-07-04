@@ -178,7 +178,7 @@ class RectanglePackerDemo extends Sprite {
 			mScalingBox.updateBox(mScalingBox.newBoxWidth, mScalingBox.newBoxHeight);
 			mBitmapData.fillRect(mBitmapData.rect, 0xFFFFFFFF);
 			var rect:Rectangle = new Rectangle();
-			for (j in 0...mPacker.rectangleCount-1)
+			for (j in 0...mPacker.rectangleCount)
 			{
 				rect = mPacker.getRectangle(j, rect);
 				mBitmapData.fillRect(new Rectangle(rect.x, rect.y, rect.width, rect.height), 0xFF000000);
